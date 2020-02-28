@@ -20,11 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-<<<<<<< HEAD
-SECRET_KEY = 'xr_)$z6ggd5c3scmtkk@3k2-(m@=1&*php=@ws(@qji6zyd_!-'
-=======
 SECRET_KEY = 'wle1hp20q@p+&hxj0)c^6fq+b$_#p(eq)4vdoynp5t$=t5ye2s'
->>>>>>> 8fa3372cbfca7edcb304f8b42827f88405f19d42
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,10 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
     'channel',
-=======
->>>>>>> 8fa3372cbfca7edcb304f8b42827f88405f19d42
+    'common',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +76,6 @@ WSGI_APPLICATION = 'immfly.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-<<<<<<< HEAD
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -89,26 +83,24 @@ DATABASES = {
     }
 }
 
-
-=======
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'localhost',
-        'PORT': 5432,
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'admin',
+            'USER': 'admin',
+            'HOST': 'localhost',
+            'PORT': 5432,
+        }
+    }
 
->>>>>>> 8fa3372cbfca7edcb304f8b42827f88405f19d42
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
