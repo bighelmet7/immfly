@@ -1,8 +1,10 @@
 from decimal import Decimal
+from queue import Queue
 
-from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.postgres.fields import JSONField
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
+from django.db.models import Avg
 
 from common.models import Language
 
@@ -13,7 +15,6 @@ class TreeChannel(models.Model):
     entertainments system, containing the parent root.
     """
 
-    root = models.ForeignKey('ChannelNode', blank=True, related_name='tree', on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
 
 
@@ -26,20 +27,57 @@ class ChannelNode(models.Model):
     have set the attribute contents.
     """
 
-    parent = models.ForeignKey('self', blank=True, related_name='children', on_delete=models.CASCADE)
+    root = models.ForeignKey(
+        'TreeChannel',
+        blank=True,
+        null=True,
+        related_name='tree',
+        on_delete=models.CASCADE
+    )
+
+    parent = models.ForeignKey(
+        'self',
+        blank=True,
+        null=True,
+        related_name='children',
+        on_delete=models.CASCADE
+    )
 
     title = models.CharField(max_length=250)
     language = models.ForeignKey(Language, on_delete=models.PROTECT)
     picture = models.ImageField(blank=True)
     thumbnail = models.ImageField(blank=True, height_field=100, width_field=100)
 
-    contents = models.ForeignKey('Content', related_name='channel', blank=True, null=True, on_delete=models.CASCADE)
-
     def save(self, *args, **kwargs):
-        if self.children is not None and self.contents:
-            return # A ChannelNode with children can not have contents.
+
+        if self.children.count() and self.contents.count():
+            raise ValueError('A parent ChannelNode can not have contents in it.')
 
         super().save(*args, **kwargs)
+
+    def _irate_value(self, node):
+        """
+        Base case: if node is a leaf then returns the AVG of its contents.
+        Induction: the Avg of a parent node depends on the avg of its children.
+        """
+        if not node.children.count():
+            content_avg = node.contents.all().aggregate(Avg('rating_value'))
+            return content_avg['rating_value__avg']
+
+        n_nodes = 0
+        _rate_sum = Decimal('0')
+        for child in node.children.all():
+            n_nodes += child.children.count()
+            _rate_sum += self._irate_value(child)
+        n_nodes += node.children.count()
+        return Decimal(_rate_sum / n_nodes)
+
+    @property
+    def rating_value(self):
+        """
+        Calculate the rating value of a channel.
+        """
+        return self._irate_value(self)
 
 
 class Content(models.Model):
@@ -52,8 +90,15 @@ class Content(models.Model):
     item = models.FileField()
     meta_info = JSONField(blank=True, null=True)
     rating_value = models.DecimalField(
-        default=Decimal('0.00'),
-        max_digits=2,
+        default=Decimal('0'),
+        max_digits=4,
         decimal_places=2,
-        validators=[MinValueValidator('0.00'), MaxValueValidator('10.00')],
+        validators=[MinValueValidator(Decimal('0')), MaxValueValidator(Decimal('10'))],
+    )
+    channel = models.ForeignKey(
+        'ChannelNode',
+        related_name='contents',
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE
     )
