@@ -1,5 +1,6 @@
 import factory
 
+from common.factories import LanguageFactory
 from channel.models import TreeChannel, ChannelNode, Content
 
 
@@ -15,8 +16,7 @@ class ChannelNodeFactory(factory.DjangoModelFactory):
         model = ChannelNode
 
     parent = factory.LazyAttribute(lambda x: ChannelNodeFactory(parent=None))
-    # language = 
-    # picture
+    language = factory.SubFactory(LanguageFactory)
 
     @factory.post_generation
     def contents(self, create, extracted, **kwargs):
@@ -31,5 +31,3 @@ class TreeChannelFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = TreeChannel
-
-    root = factory.SubFactory(ChannelNodeFactory)
