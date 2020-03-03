@@ -60,11 +60,11 @@ class ChannelNodeTest(TestCase):
         Root → Series → Atresplayer → El club de la comedia → El club de la comedia (Chapter 1)
         """
         language = LanguageFactory()
-        root = TreeChannelFactory(
+        tree = TreeChannelFactory(
             name='Root'
         )
         series = ChannelNodeFactory(
-            root=root,
+            tree=tree,
             title='Series',
             language=language,
         )
@@ -119,6 +119,7 @@ class ChannelNodeTest(TestCase):
         # Having a language, parent and a leaf node, and a set of contents
         language = LanguageFactory()
         parent = ChannelNodeFactory(
+            title='Series',
             language=language,
         )
         content_1 = ContentFactory(
@@ -132,10 +133,66 @@ class ChannelNodeTest(TestCase):
         )
         leaf_1 = ChannelNodeFactory(
             parent=parent,
+            title='El club de la comedia',
             contents=[content_1, content_2],
         )
         leaf_2 = ChannelNodeFactory(
             parent=parent,
+            title='La casa de aluminio',
             contents=[content_3],
         )
-        self.assertEqual(parent.rating_value, Decimal('6.215'))
+        result, _ = parent.rating_value
+        self.assertEqual(result, Decimal('6.215'))
+
+    def test_get_rating_average_of_all_channels(self):
+        """
+        Calculate the rating value of all the channels in the hierarchy.
+        """
+        # Having a language, parent and a leaf node, and a set of contents
+        language = LanguageFactory()
+        parent = ChannelNodeFactory(
+            title='Series',
+            language=language,
+        )
+        content_1 = ContentFactory(
+            rating_value=Decimal('3.14')
+        )
+        content_2 = ContentFactory(
+            rating_value=Decimal('5.12')
+        )
+        content_3 = ContentFactory(
+            rating_value=Decimal('8.3')
+        )
+        leaf_1 = ChannelNodeFactory(
+            parent=parent,
+            title='El club de la comedia',
+            contents=[content_1, content_2],
+        )
+        leaf_2 = ChannelNodeFactory(
+            parent=parent,
+            title='La casa de aluminio',
+            contents=[content_3],
+        )
+        child = ChannelNodeFactory(
+            parent=parent,
+            title='Atres Player',
+        )
+        leaf_child = ChannelNodeFactory(
+            parent=child,
+            title='Cosas 1',
+            contents=[
+                ContentFactory(rating_value=Decimal('4.2')),
+                ContentFactory(rating_value=Decimal('8.1')),
+            ]
+        )
+        result, history = parent.rating_value
+        expected_result = Decimal('6.193')
+        expected_history = {
+            'El club de la comedia': Decimal('4.13'),
+            'La casa de aluminio': Decimal('8.3'),
+            'Cosas 1': Decimal('6.15'),
+            'Atres Player': Decimal('6.15'),
+            'Series': Decimal('6.193'),
+        }
+        self.assertEqual(expected_history, history)
+        self.assertEqual(expected_result, result)
