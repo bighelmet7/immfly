@@ -16,6 +16,7 @@ class ChannelNodeFactory(factory.DjangoModelFactory):
         model = ChannelNode
 
     parent = factory.LazyAttribute(lambda x: ChannelNodeFactory(parent=None))
+    title = factory.Faker('name')
     language = factory.SubFactory(LanguageFactory)
 
     @factory.post_generation
@@ -31,3 +32,5 @@ class TreeChannelFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = TreeChannel
+
+    name = factory.Faker('name')
