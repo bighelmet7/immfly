@@ -7,12 +7,14 @@ services:
             - ./data/postgres:/var/lib/postgresql/data
     exam:
         build: .
-        command: daphne -p 8080 --access-log - /opt/immfly-dockerize/immfly.asgi:application
+        command: daphne -b 0.0.0.0 -p 8080 --access-log /var/logs/immfly/immfly.logs immfly.asgi:application
         volumes:
             - ./immfly:/opt/immfly-dockerize
+            - ./immfly/immfly/static:/opt/immfly-dockerize/immfly/static
+            - ./data/immfly:/var/logs/immfly
         ports:
             - "8080:8080"
-        depends_on: 
+        depends_on:
             - db
         links:
             - db:db
