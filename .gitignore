@@ -133,3 +133,4 @@ dmypy.json
 
 # Static files
 static/
+data/
