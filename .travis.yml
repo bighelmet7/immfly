@@ -4,6 +4,12 @@ python:
     - "3.8"
 
 install:
+    - pip install codecov
     - pip install -r immfly/requirements.txt
 
-script: python immfly/manage.py test
+script:
+    - python immfly/manage.py test
+    - coverage run --source "immfly" immfly/manage.py test
+
+after_success:
+    - codecov
