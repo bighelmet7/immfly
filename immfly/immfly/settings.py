@@ -23,7 +23,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'wle1hp20q@p+&hxj0)c^6fq+b$_#p(eq)4vdoynp5t$=t5ye2s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", default=True)
+if "false" == DEBUG.lower():
+    DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -94,9 +98,10 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'admin',
-            'USER': 'admin',
-            'HOST': 'localhost',
+            'NAME': os.getenv('DB_NAME', default='local_admin'),
+            'USER': os.getenv('DB_USER', default='local_admin'),
+            'PASSWORD': os.getenv('DB_PASSWORD', default='local_admin'),
+            'HOST': os.getenv('DB_HOST', default='localhost'),
             'PORT': 5432,
         }
     }
@@ -137,10 +142,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.getenv('DJANGO_STATIC_ROOT', default=os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
 
 STATIC_URL = '/static/'
