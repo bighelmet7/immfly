@@ -1,0 +1,9 @@
+language: python
+
+python:
+    - "3.8"
+
+install:
+    - pip install -r immfly/requirements.txt
+
+script: python immfly/manage.py test
