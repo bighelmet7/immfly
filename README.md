@@ -84,26 +84,3 @@ The demanded command for calculating all the rate values is:
 ```bash
 python manage.py rating_value <NAME_OF_A_ROOT_IN_A_TREE>
  ```
-
-## Coverage:
-Name                                          Stmts   Miss  Cover
------------------------------------------------------------------
-api/__init__.py                                   0      0   100%
-api/fields.py                                    10      0   100%
-api/serializers.py                               25      0   100%
-api/tests.py                                      1      0   100%
-api/urls.py                                       3      0   100%
-channel/__init__.py                               0      0   100%
-channel/factories.py                             22      1    95%
-channel/management/__init__.py                    0      0   100%
-channel/management/commands/__init__.py           0      0   100%
-channel/management/commands/rating_value.py      24     24     0%
-channel/models.py                                48      3    94%
-channel/tests.py                                 65      0   100%
-common/__init__.py                                0      0   100%
-common/factories.py                               8      0   100%
-common/models.py                                  9      1    89%
-common/tests.py                                   1      0   100%
-utils/__init__.py                                 4      0   100%
------------------------------------------------------------------
-TOTAL                                           220     29    87%
