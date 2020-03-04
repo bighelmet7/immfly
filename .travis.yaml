@@ -10,6 +10,7 @@ install:
 script:
     - python immfly/manage.py test
     - coverage run --source "immfly" immfly/manage.py test
+    - coverage report --omit="*/migrations*,immfly/*,manage.py,*/admin*,*/apps*,*/views*"
 
 after_success:
     - codecov
