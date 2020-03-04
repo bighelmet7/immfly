@@ -4,6 +4,7 @@ python:
     - "3.8"
 
 install:
+    - pip install codecov
     - pip install -r immfly/requirements.txt
 
 script:
