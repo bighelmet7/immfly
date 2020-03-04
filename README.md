@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.com/bighelmet7/immfly.svg?token=qVuyqSjnTjTxdCoTkHDd&branch=master)](https://travis-ci.com/bighelmet7/immfly)
 
+[![codecov](https://codecov.io/gh/bighelmet7/immfly/branch/master/graph/badge.svg)](https://codecov.io/gh/bighelmet7/immfly)
+
+
 Technical exam that emulates a small entertainment service.
 
 # Requirements
