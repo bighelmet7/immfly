@@ -3,18 +3,40 @@ version: '3'
 services:
     db:
         image: postgres
+        environment:
+            POSTGRES_USER: immfly
+            POSTGRES_PASSWORD: immfly-1234 # THIS IS JUST FOR EXAM PROPOUSE, SHOULD BE DONE WITH: DOCKER SECRETS.
+            POSTGRES_DB: immfly
         volumes:
             - ./data/postgres:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
     exam:
         build: .
-        command: daphne -b 0.0.0.0 -p 8080 --access-log /var/logs/immfly/immfly.logs immfly.asgi:application
+        environment:
+            DB_USER: immfly
+            DB_PASSWORD: immfly-1234
+            DB_NAME: immfly
+            DB_HOST: db
+            DJANGO_SUPERUSER_USERNAME: test
+            DJANGO_SUPERUSER_PASSWORD: immfly1234 # THIS IS JUST FOR EXAM PROPOUSE, SHOULD BE DONE WITH: DOCKER SECRETS.
+            DJANGO_SUPERUSER_EMAIL: immfly@test.com
+            DJANGO_STATIC_ROOT: /opt/immfly-dockerize
+            DEBUG: "False"
+        command: >
+            bash -c "python manage.py collectstatic --noinput -link
+            && python manage.py makemigrations
+            && python manage.py migrate --noinput
+            && python manage.py createsuperuser --noinput
+            && daphne -b 0.0.0.0 -p 8080 --access-log /var/logs/immfly/immfly.logs immfly.asgi:application"
         volumes:
             - ./immfly:/opt/immfly-dockerize
-            - ./immfly/immfly/static:/opt/immfly-dockerize/immfly/static
+            - ./immfly/static:/opt/immfly-dockerize/static
             - ./data/immfly:/var/logs/immfly
+            - ./data/files:/data/immfly
+        expose:
+            - "8080"
         ports:
             - "8080:8080"
         depends_on:
             - db
-        links:
-            - db:db
